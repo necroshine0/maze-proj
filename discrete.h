@@ -34,7 +34,7 @@ public:
     }
 
     const double GetProb() const { return probability; }
-    // void SetProb(double prob) { probability = prob; }
+    void SetProb(double prob) { probability = prob; }
 
     virtual void method(const Maze& mz, std::vector<int>& v, size_t subseq_size) const {}
     virtual void name() const {}
@@ -62,16 +62,6 @@ public:
 
     Symmetry(double prob) : DiscreteOperator(prob) {}
 
-        /*
-        1. Начальная последовательность кодируется в виде "LRUP"
-        2. Определяется симметричный разрез графа
-        3. Ищется вершина, симметричная начальной
-        4. Строится новая последовательноть :
-            Если разрез - вертикальный, L меняется на R и наоборот
-            Если разрез - горизонтальный, U меняется на D и наоборот
-        5. По полученной последовательности восстанавливаем симметричный путь,
-            зная вершину из пункта 3.
-        */
     void method(const Maze& mz, std::vector<int>& v, size_t subseq_size) const override {
         if (probability == .0) return;
         if (subseq_size > v.size()) { return; }
@@ -84,14 +74,12 @@ public:
 
         auto gph = mz.GetGraphList();
 
-        // Если рассматриваем горизонтальный разрез,
-        // то LR меняем на UD
         int tmp = first_vert;
         int count_left = 0;
         while (true) {
             size_t i = 0;
             while (i < gph[tmp].size() && 
-                   DIRS.DirectionBetween(tmp, gph[tmp][i]) != "L") {
+                   DIRS.DirectionBetween(tmp, gph[tmp][i]).back() != 'L') {
                 ++i;
             }
             if (i < gph[tmp].size()) {
@@ -104,7 +92,7 @@ public:
         while (true) {
             size_t i = 0;
             while (i < gph[tmp].size() &&
-                DIRS.DirectionBetween(tmp, gph[tmp][i]) != "R") {
+                DIRS.DirectionBetween(tmp, gph[tmp][i]).back() != 'R') {
                 ++i;
             }
             if (i < gph[tmp].size()) {
@@ -117,7 +105,7 @@ public:
         int new_vert = tmp;
         for (size_t j = 0; j < count_left; ++j) {
             for (size_t i = 0; i < gph[new_vert].size(); ++i) {
-                if (DIRS.DirectionBetween(new_vert, gph[new_vert][i]) == "L") {
+                if (DIRS.DirectionBetween(new_vert, gph[new_vert][i]).back() == 'L') {
                     new_vert = gph[new_vert][i];
                 }
             }

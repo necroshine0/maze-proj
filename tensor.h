@@ -77,7 +77,7 @@ public:
 };
 
 // «адаетс€ матрица смежности по списку с весами 1
-graph_int construct_table(const graph_int& gph) {
+graph_int construct_table(const graph_int& gph, const std::vector<Vertex>& vs) {
     size_t n = gph.size();
     graph_int tbl(n, std::vector<int>(n));
 
@@ -86,7 +86,8 @@ graph_int construct_table(const graph_int& gph) {
         tbl[i][i] = 0;
         forn(j, gph[i].size()) {
             if (i != gph[i][j]) {
-                tbl[i][gph[i][j]] = 1;
+                tbl[i][gph[i][j]] = std::abs(vs[i].GetX() - vs[j].GetX()) +
+                                    std::abs(vs[i].GetY() - vs[j].GetY());
             }
         }
     }

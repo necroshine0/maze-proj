@@ -103,8 +103,8 @@ public:
                     if (u.GetX() - v.GetX() > 0)
                         dirs[i][j] = "L";
                     else dirs[i][j] = "R";
-                }  // ƒиагонали, если вдруг пригод€тс€
-                /*else if (u.GetX() != v.GetX() && u.GetY() != v.GetY()){
+                }
+                else if (u.GetX() != v.GetX() && u.GetY() != v.GetY()){
                     if (u.GetX() > v.GetX() && u.GetY() > v.GetY()) {
                         dirs[i][j] = "UR";
                     }
@@ -117,7 +117,7 @@ public:
                     else if (u.GetX() < v.GetX() && u.GetY() < v.GetY()) {
                         dirs[i][j] = "DL";
                     }
-                }*/
+                }
             }
         }
     }
@@ -183,36 +183,28 @@ public:
     }
 };
 
-void switch_directions(std::string& dr, int MODE) {
+void switch_direction(std::string& dr, int MODE) {
     if (MODE == 0) {
-        if (dr == "U") { dr = "D"; }
-        else if (dr == "D") { dr = "U"; }
+        if (dr.front() == 'U') { dr.front() = 'D'; }
+        else if (dr.front() == 'D') { dr.front() = 'U'; }
     }
     else if (MODE == 1) {
-        if (dr == "L") { dr = "R"; }
-        else if (dr == "R") { dr = "L"; }
-    }
-    else {
-        if (dr == "U") { dr = "D"; }
-        else if (dr == "D") { dr = "U"; }
-        else if (dr == "L") { dr = "R"; }
-        else if (dr == "R") { dr = "L"; }
+        if (dr.back() == 'L') { dr.back() = 'R'; }
+        else if (dr.back() == 'R') { dr.back() = 'L'; }
     }
 }
 
 void inverse_dirs(std::vector<std::string>& drs, std::string TYPE) {
-    int MODE;
+    // ≈сли TYPE не соответствует значению 0 или 1, разрез по умолчанию вертикальный
+    int MODE = 1;
     if (TYPE == "horizontal") {
         MODE = 0;
     }
     else if (TYPE == "vertical") {
         MODE = 1;
     }
-    else {
-        MODE = 12;
-    }
 
     for (size_t i = 0; i < drs.size(); ++i) {
-        switch_directions(drs[i], MODE);
+        switch_direction(drs[i], MODE);
     }
 }
