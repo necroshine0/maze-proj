@@ -1,0 +1,33 @@
+A B C D E F G H I J K L M N O P
+D: 1 1 0 0 | (0, 0)
+H C
+C: 0 | (1, 0)
+D G B
+B: 0 | (2, 0)
+C F A
+A: 0 | (3, 0)
+B E
+H: 0 | (0, 1)
+L G D
+G: 0 | (1, 1)
+H K F C
+F: 0 | (2, 1)
+G J E B
+E: 0 | (3, 1)
+F I A
+L: 0 | (0, 2)
+P K H
+K: 0 | (1, 2)
+L O J G
+J: 0 | (2, 2)
+K N I F
+I: 0 | (3, 2)
+J M E
+P: 0 | (0, 3)
+L O
+O: 0 | (1, 3)
+P N K
+N: 0 | (2, 3)
+O M J
+M: 0 | (3, 3)
+N I
