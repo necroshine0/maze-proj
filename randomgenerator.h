@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
 
-// Класс можно дополнить различными распределениями из
+// ГЉГ«Г Г±Г± Г¬Г®Г¦Г­Г® Г¤Г®ГЇГ®Г«Г­ГЁГІГј Г°Г Г§Г«ГЁГ·Г­Г»Г¬ГЁ Г°Г Г±ГЇГ°ГҐГ¤ГҐГ«ГҐГ­ГЁГїГ¬ГЁ ГЁГ§
 // https://en.cppreference.com/w/cpp/numeric/random
 
 class RandomGenerator {
@@ -10,8 +10,7 @@ private:
 
 public:
     RandomGenerator() {
-        std::random_device rd;
-        gen.seed(rd());
+        gen.seed(time(0));
     }
 
     double d_udist(double a, double b) {
