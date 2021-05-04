@@ -19,14 +19,6 @@ public:
         }
     }
 
-    void numbered_chars() const {
-        size_t n = digs.size();
-        for (size_t i = 0; i != n; ++i) {
-            std::cout << symbs.at(i) << ":" << i << "; ";
-        }
-        std::cout << '\n';
-    }
-
     int operator[] (char c) const { return this->digs.at(c); }
     template <typename T>
     char operator[] (T v) const { return this->symbs.at(v); }
