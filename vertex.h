@@ -106,16 +106,16 @@ public:
                 }
                 else if (u.GetX() != v.GetX() && u.GetY() != v.GetY()){
                     if (u.GetX() > v.GetX() && u.GetY() > v.GetY()) {
-                        dirs[i][j] = "UR";
+                        dirs[i][j] = "DL";
                     }
                     else if (u.GetX() > v.GetX() && u.GetY() < v.GetY()) {
-                        dirs[i][j] = "DR";
-                    }
-                    else if (u.GetX() < v.GetX() && u.GetY() > v.GetY()) {
                         dirs[i][j] = "UL";
                     }
+                    else if (u.GetX() < v.GetX() && u.GetY() > v.GetY()) {
+                        dirs[i][j] = "DR";
+                    }
                     else if (u.GetX() < v.GetX() && u.GetY() < v.GetY()) {
-                        dirs[i][j] = "DL";
+                        dirs[i][j] = "UR";
                     }
                 }
             }
@@ -123,17 +123,17 @@ public:
     }
 
     void PrintDirections(const Bjn& bjn) const {
-        std::cout << '\t';
+        std::cout << " \t";
         for (size_t i = 0; i < dirs.size(); ++i) {
-            std::cout << bjn[i] << '\t';
+            std::cout << bjn[i] << " \t";
         }
 
         std::cout << '\n';
 
         for (size_t i = 0; i < dirs.size(); ++i) {
-            std::cout << bjn[i] << ":\t";
+            std::cout << bjn[i] << ": \t";
             for (size_t j = 0; j < dirs[i].size(); ++j) {
-                std::cout << dirs[i][j] << "\t";
+                std::cout << dirs[i][j] << " \t";
             }
 
             std::cout << '\n';

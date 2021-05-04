@@ -70,45 +70,46 @@ public:
         Directions DIRS = mz.GetDirections();
         auto str_v = DIRS.convert_to_dirs(subv);
         int first_vert = subv.front();
+        // Теоретически можно использовать и горизонтальный тип разреза
         std::string type = "vertical";
 
         auto gph = mz.GetGraphList();
-
-        int tmp = first_vert;
-        int count_left = 0;
-        while (true) {
-            size_t i = 0;
-            while (i < gph[tmp].size() && 
-                   DIRS.DirectionBetween(tmp, gph[tmp][i]).back() != 'L') {
-                ++i;
-            }
-            if (i < gph[tmp].size()) {
-                ++count_left;
-                tmp = gph[tmp][i];
-            } else { break; }
+        auto vs = mz.GetVertexes();
+        auto borders = mz.GetBorders(type);
+        // std::cout << borders.first << ' ' << borders.second << '\n';
+        // std::cout << vs[first_vert].GetX() << ' ' << vs[first_vert].GetY() << '\n';
+        // Симметричная вершина - это вершина с координатами:
+        int x, y;
+        if (type == "vertical") {
+            x = borders.second - (vs[first_vert].GetX() - borders.first);
+            y = vs[first_vert].GetY();
+        } else if (type == "horizontal") {
+            x = vs[first_vert].GetX();
+            y = borders.second - (vs[first_vert].GetY() - borders.first);
         }
 
-        tmp = first_vert;
-        while (true) {
-            size_t i = 0;
-            while (i < gph[tmp].size() &&
-                DIRS.DirectionBetween(tmp, gph[tmp][i]).back() != 'R') {
-                ++i;
+        int new_vert = -1;
+        for (auto v : vs) {
+            if (v.GetX() == x && v.GetY() == y) {
+                new_vert = v.number;
+                break;
             }
-            if (i < gph[tmp].size()) {
-                //std::cout << mz.GetBjn()[gph[tmp][i]] << '\n';
-                tmp = gph[tmp][i];
-            }
-            else { break; }
         }
 
-        int new_vert = tmp;
-        for (size_t j = 0; j < count_left; ++j) {
-            for (size_t i = 0; i < gph[new_vert].size(); ++i) {
-                if (DIRS.DirectionBetween(new_vert, gph[new_vert][i]).back() == 'L') {
-                    new_vert = gph[new_vert][i];
-                }
+        try {
+            if (new_vert == -1) {
+                throw std::invalid_argument("ОШИБКА ПРЕОБРАЗОВАНИЯ");
             }
+        } catch (std::invalid_argument& e) {
+            std::cerr << e.what() << ": ";
+            std::cerr << "НЕВОЗМОЖНО ПОСТРОИТЬ СИММЕТРИЧНЫЙ ПУТЬ ДЛЯ ПУТИ [ ";
+            for (size_t i = 0; i != subv.size(); ++i) {
+                std::cerr << mz.GetBjn()[subv[i]] << ' ';
+            }
+
+            std::cerr << "]\n";
+            std::cerr << "ВОЗМОЖНО, ЛАБИРИНТ НЕ ЯВЛЯЕТСЯ СИММЕТРИЧНЫМ\n";
+            exit(1);
         }
 
         std::vector<int> tmp_v = mz.GetTensor()(subv.back(), new_vert);
@@ -170,7 +171,8 @@ public:
         }
 
         auto path = mz.GetTensor()(current_v, fixed_v);
-        for (size_t i = 1; i < path.size(); ++i) {
+
+        for (size_t i = 0; i < path.size(); ++i) {
             v.push_back(path[i]);
         }
 

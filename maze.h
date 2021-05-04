@@ -12,18 +12,17 @@
 
 using graph_int = std::vector<std::vector<int>>;
 extern RandomGenerator gen;
+extern const int INF;
 
 class Maze {
 private:
+    Bjn bjn;
     Symmetric_Tensor3D ST;
     Directions DIRS;
     graph_int gph;
-    Bjn bjn;
     std::vector<Vertex> vertexes;
 
 public:
-
-
     Maze(const Bjn& b,
             const std::vector<Vertex>& vs,
                 const graph_int& tbl) {
@@ -31,9 +30,9 @@ public:
         bjn = b;
         vertexes = vs;
 
-        graph_int matrix = construct_table(tbl);
-        ST = floyd_warshall(matrix);
-
+        graph_int matrix = construct_table(tbl, vertexes);
+        // alert_adj_table(matrix, bjn);
+        ST = floyd_warshall(matrix, vertexes);
         DIRS = Directions(vertexes, matrix);
     }
 
@@ -43,12 +42,30 @@ public:
     const graph_int GetGraphList() const { return gph; }
     const Symmetric_Tensor3D GetTensor() const { return ST; }
 
+    const std::pair<int, int> GetBorders(std::string type) const {
+        int mn = 0, mx = 0;
+        if (type == "vertical") {
+            for (auto v : vertexes) {
+                if (v.GetX() < mn) { mn = v.GetX(); }
+                if (v.GetX() > mx) { mx = v.GetX(); }
+            }
+        } else if (type == "horizontal") {
+            for (auto v : vertexes) {
+                if (v.GetY() < mn) { mn = v.GetY(); }
+                if (v.GetY() > mx) { mx = v.GetY(); }
+            }
+        }
+
+        return std::make_pair(mn, mx);
+    }
+
     void MazeInfo() const {
+        std::cout << "VERTEXES INFO:\n";
         alert_vertexes(bjn, gph, vertexes);
         std::cout << '\n';
 
         std::cout << "ADJ LIST:\n";
-        alert(gph);
+        alert(gph, bjn);
         std::cout << '\n';
 
         std::cout << "DIRECTIONS:\n";

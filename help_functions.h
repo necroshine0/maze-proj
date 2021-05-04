@@ -8,6 +8,7 @@
 #include "vertex.h"
 
 using graph_int = std::vector<std::vector<int>>;
+extern const int INF;
 
 // Вывод вектора
 template <typename T>
@@ -29,6 +30,46 @@ void alert(const std::vector<std::vector<T>>& tbl) {
         }
         std::cout << '\n';
     }
+}
+
+// Вывод таблицы в символьном формате
+template <typename T>
+void alert(const std::vector<std::vector<T>>& tbl, const Bjn& bjn) {
+    for (size_t i = 0; i < tbl.size(); ++i) {
+        std::cout << bjn[i] << ":  ";
+        for (size_t j = 0; j < tbl[i].size(); ++j) {
+            std::cout << bjn[tbl[i][j]] << "  ";
+        }
+        std::cout << '\n';
+    }
+}
+
+// Вывод матрицы смежности
+template <typename T>
+void alert_adj_table(const std::vector<std::vector<T>>& tbl, const Bjn& bjn) {
+    std::cout << " \t";
+    for (size_t i = 0; i < tbl.size(); ++i) {
+        std::cout << bjn[i] << " \t";
+    }
+    std::cout << "\n";
+    for (size_t i = 0; i < tbl.size(); ++i) {
+        std::cout << bjn[i] << ": \t";
+        for (size_t j = 0; j < tbl[i].size(); ++j) {
+            if (tbl[i][j] == INF) {
+                std::cout << "INF \t";
+            }
+            else if (tbl[i][j] == 0) {
+                std::cout << " \t";
+            }
+            else {
+                std::cout << tbl[i][j] << " \t";
+            }
+        }
+
+        std::cout << '\n';
+    }
+
+    std::cout << '\n';
 }
 
 // Как в питоне

@@ -16,7 +16,9 @@ extern const int INF;
 class Symmetric_Tensor3D {
 private:
     std::vector<std::vector<int>> ST;
-    // graph_int dists;
+    // Массив кратчайших путей от входа к выходу (костыль)
+    std::vector<std::vector<int>> from_en_to_ex;
+    std::vector<Vertex> vertexes;
     size_t quantity_V = 0;
     size_t size = 0;
 
@@ -27,6 +29,7 @@ public:
     }
 
     void SetVertsQuantity(size_t V) { quantity_V = V; }
+    void SetVertexes(const std::vector<Vertex>& vs) { vertexes = vs; }
 
     const std::vector<int> operator[] (size_t i) const { return ST[i]; }
     // const graph_int GetDists() const { return dists; }
@@ -44,7 +47,19 @@ public:
     }
     // Оператор двойной индексации
     std::vector<int> operator() (size_t k, size_t j) const {
-        // Если равны, вернуть просто std::vector<int> ({ k })
+        if (vertexes[k].is_entry && vertexes[j].is_exit) {
+            std::vector<int> out;
+            for (auto path : from_en_to_ex) {
+                if (path.front() == k && path.back() == j) {
+                    foran(t, 1, path.size()) {
+                        out.push_back(path[t]);
+                    }
+
+                    return out;
+                }
+            }
+        }
+
         if (k == j) {
             // std::cout << "ВОЗВРАЩЕН ПУСТОЙ ВЕКТОР\n";
             return std::vector<int>();
@@ -74,6 +89,10 @@ public:
         ST.push_back(v);
         ++size;
     }
+
+    void add(std::vector<int> v) {
+        from_en_to_ex.push_back(v);
+    }
 };
 
 // Задается матрица смежности по списку с весами 1
@@ -84,10 +103,10 @@ graph_int construct_table(const graph_int& gph, const std::vector<Vertex>& vs) {
     forn(i, n) {
         tbl[i].assign(n, INF);
         tbl[i][i] = 0;
-        forn(j, gph[i].size()) {
-            if (i != gph[i][j]) {
-                tbl[i][gph[i][j]] = std::abs(vs[i].GetX() - vs[j].GetX()) +
-                                    std::abs(vs[i].GetY() - vs[j].GetY());
+        for ( auto j : gph[i]) {
+            if (i != j) {
+                tbl[i][j] = std::abs(vs[i].GetX() - vs[j].GetX()) +
+                            std::abs(vs[i].GetY() - vs[j].GetY());
             }
         }
     }
@@ -96,7 +115,7 @@ graph_int construct_table(const graph_int& gph, const std::vector<Vertex>& vs) {
 }
 
 // Благодарность: Владимиру Фолунину, преподавателю алгоритмов НИУ ВШЭ
-Symmetric_Tensor3D floyd_warshall(const graph_int& gph) {
+Symmetric_Tensor3D floyd_warshall(const graph_int& gph, const std::vector<Vertex> VS) {
     size_t n = gph.size();
     graph_int result = gph;
     graph_int H(n, std::vector<int>(n));
@@ -126,6 +145,7 @@ Symmetric_Tensor3D floyd_warshall(const graph_int& gph) {
 
     Symmetric_Tensor3D recovered(n);
     recovered.SetVertsQuantity(n);
+    recovered.SetVertexes(VS);
 
     std::vector<int> path;
     forn(i, n) {
@@ -138,6 +158,22 @@ Symmetric_Tensor3D floyd_warshall(const graph_int& gph) {
             path.push_back(j);
             recovered.pb(path);
             path.clear();
+        }
+    }
+
+
+    forn(i, n) {
+        forn(j, n) {
+            if (VS[i].is_entry && VS[j].is_exit) {
+                int k = i;
+                while (k != j) {
+                    path.push_back(k);
+                    k = H[k][j];
+                }
+                path.push_back(j);
+                recovered.add(path);
+                path.clear();
+            }
         }
     }
 
