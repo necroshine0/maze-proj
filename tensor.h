@@ -6,7 +6,7 @@
 
 #define all(v) (v).begin(), (v).end()
 #define forn(i, N) for (size_t i = 0; i != (N); ++i)
-#define foran(i, a, N) for (size_t i = a; i != (N); ++i)
+#define foran(i, a, N) for (int i = a; i != (N); ++i)
 #define forin(elem, v) for (auto elem : v)
 
 using graph_int = std::vector<std::vector<int>>;
@@ -16,7 +16,7 @@ extern const int INF;
 class Symmetric_Tensor3D {
 private:
     std::vector<std::vector<int>> ST;
-    // Массив кратчайших путей от входа к выходу (костыль)
+    // РњР°СЃСЃРёРІ РєСЂР°С‚С‡Р°Р№С€РёС… РїСѓС‚РµР№ РѕС‚ РІС…РѕРґР° Рє РІС‹С…РѕРґСѓ (РєРѕСЃС‚С‹Р»СЊ)
     std::vector<std::vector<int>> from_en_to_ex;
     std::vector<Vertex> vertexes;
     size_t quantity_V = 0;
@@ -45,7 +45,7 @@ public:
             std::cout << '\n';
         }
     }
-    // Оператор двойной индексации
+    // РћРїРµСЂР°С‚РѕСЂ РґРІРѕР№РЅРѕР№ РёРЅРґРµРєСЃР°С†РёРё
     std::vector<int> operator() (size_t k, size_t j) const {
         if (vertexes[k].is_entry && vertexes[j].is_exit) {
             std::vector<int> out;
@@ -61,13 +61,13 @@ public:
         }
 
         if (k == j) {
-            // std::cout << "ВОЗВРАЩЕН ПУСТОЙ ВЕКТОР\n";
+            // std::cout << "Р’РћР—Р’Р РђР©Р•Рќ РџРЈРЎРўРћР™ Р’Р•РљРўРћР \n";
             return std::vector<int>();
         }
 
         size_t i;
         std::vector<int> tmp;
-        // i < j - базовый случай, иначе (>) сводим к первому и возвращаем перевернутую строку
+        // i < j - Р±Р°Р·РѕРІС‹Р№ СЃР»СѓС‡Р°Р№, РёРЅР°С‡Рµ (>) СЃРІРѕРґРёРј Рє РїРµСЂРІРѕРјСѓ Рё РІРѕР·РІСЂР°С‰Р°РµРј РїРµСЂРµРІРµСЂРЅСѓС‚СѓСЋ СЃС‚СЂРѕРєСѓ
         if (k < j) {
             i = j - (k + 1) + k * quantity_V - k * (1 + k) / 2;
             tmp = ST[i];
@@ -95,7 +95,7 @@ public:
     }
 };
 
-// Задается матрица смежности по списку с весами 1
+// Р—Р°РґР°РµС‚СЃСЏ РјР°С‚СЂРёС†Р° СЃРјРµР¶РЅРѕСЃС‚Рё РїРѕ СЃРїРёСЃРєСѓ СЃ РІРµСЃР°РјРё 1
 graph_int construct_table(const graph_int& gph, const std::vector<Vertex>& vs) {
     size_t n = gph.size();
     graph_int tbl(n, std::vector<int>(n));
@@ -114,7 +114,7 @@ graph_int construct_table(const graph_int& gph, const std::vector<Vertex>& vs) {
     return tbl;
 }
 
-// Благодарность: Владимиру Фолунину, преподавателю алгоритмов НИУ ВШЭ
+// Р‘Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚СЊ: Р’Р»Р°РґРёРјРёСЂСѓ Р¤РѕР»СѓРЅРёРЅСѓ, РїСЂРµРїРѕРґР°РІР°С‚РµР»СЋ Р°Р»РіРѕСЂРёС‚РјРѕРІ РќРРЈ Р’РЁР­
 Symmetric_Tensor3D floyd_warshall(const graph_int& gph, const std::vector<Vertex> VS) {
     size_t n = gph.size();
     graph_int result = gph;
@@ -150,7 +150,7 @@ Symmetric_Tensor3D floyd_warshall(const graph_int& gph, const std::vector<Vertex
     std::vector<int> path;
     forn(i, n) {
         foran(j, i + 1, n) {
-            int k = i;
+            size_t k = i;
             while (k != j) {
                 path.push_back(k);
                 k = H[k][j];
@@ -165,7 +165,7 @@ Symmetric_Tensor3D floyd_warshall(const graph_int& gph, const std::vector<Vertex
     forn(i, n) {
         forn(j, n) {
             if (VS[i].is_entry && VS[j].is_exit) {
-                int k = i;
+                size_t k = i;
                 while (k != j) {
                     path.push_back(k);
                     k = H[k][j];

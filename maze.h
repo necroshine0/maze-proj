@@ -81,12 +81,12 @@ public:
         size_t current_v = bjn[start_c];
         try {
             if (!vertexes[current_v].is_entry) {
-                throw std::invalid_argument("ĞĞ•Ğ’ĞĞ›Ğ˜Ğ”ĞĞ«Ğ™ ĞĞ Ğ“Ğ£ĞœĞ•ĞĞ¢");
+                throw std::invalid_argument("ÍÅÂÀËÈÄÍÛÉ ÀĞÃÓÌÅÍÒ");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << ": ";
-            std::cerr << "Ğ¡Ğ¢ĞĞ Ğ¢ĞĞ’ĞĞ¯ Ğ’Ğ•Ğ Ğ¨Ğ˜ĞĞ Ğ”ĞĞ›Ğ–ĞĞ« Ğ¯Ğ’Ğ›Ğ¯Ğ¢Ğ¬Ğ¡Ğ¯ Ğ¢ĞĞ§ĞšĞĞ™ Ğ’Ğ¥ĞĞ”Ğ Ğ’ Ğ›ĞĞ‘Ğ˜Ğ Ğ˜ĞĞ¢\n";
+            std::cerr << "ÑÒÀĞÒÎÂÀß ÂÅĞØÈÍÀ ÄÎËÆÍÛ ßÂËßÒÜÑß ÒÎ×ÊÎÉ ÂÕÎÄÀ Â ËÀÁÈĞÈÍÒ\n";
             exit(1);
         }
 
@@ -110,7 +110,7 @@ public:
     }
 };
 
-// Ğ¤Ğ°Ğ¹Ğ» ÑĞ¾Ñ…Ñ€Ğ°Ğ½ÑÑ‚ÑŒ Ğ² ANSI
+// Ôàéë ñîõğàíÿòü â ANSI
 Maze Construct_Maze(std::string filename) {
     setlocale(LC_ALL, "rus");
     std::ifstream file;
@@ -118,7 +118,7 @@ Maze Construct_Maze(std::string filename) {
 
     try {
         if (!file.is_open())
-            throw std::runtime_error("ĞĞ• Ğ£Ğ”ĞĞ›ĞĞ¡Ğ¬ ĞĞ¢ĞšĞ Ğ«Ğ¢Ğ¬ Ğ¤ĞĞ™Ğ›");
+            throw std::runtime_error("ÍÅ ÓÄÀËÎÑÜ ÎÒÊĞÛÒÜ ÔÀÉË");
     } catch (std::runtime_error & e) {
         std::cerr << e.what() << '\n';
         exit(1);

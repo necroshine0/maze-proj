@@ -50,27 +50,27 @@ public:
     void SetY(int y) {  point.second = y; }
 };
 
-// Вывод вершины типа Vertex
+// Р’С‹РІРѕРґ РІРµСЂС€РёРЅС‹ С‚РёРїР° Vertex
 void alert_vertex(const Bjn& bjn,
     const std::vector<std::vector<int>>& tbl, const Vertex& v) {
-    std::cout << "Точка: " << bjn[v.number] << '\n';
-    std::cout << "Номер: " << v.number << '\n';
-    std::cout << "Координаты: (" << v.GetX() << ", " << v.GetY() << ")\n";
-    std::cout << "Биологическое значение: " << v.bio_value << '\n';
+    std::cout << "РўРѕС‡РєР°: " << bjn[v.number] << '\n';
+    std::cout << "РќРѕРјРµСЂ: " << v.number << '\n';
+    std::cout << "РљРѕРѕСЂРґРёРЅР°С‚С‹: (" << v.GetX() << ", " << v.GetY() << ")\n";
+    std::cout << "Р‘РёРѕР»РѕРіРёС‡РµСЃРєРѕРµ Р·РЅР°С‡РµРЅРёРµ: " << v.bio_value << '\n';
     if (v.bio_value) {
         if (v.is_entry)
-            std::cout << "Точка является входом в лабиринт\n";
+            std::cout << "РўРѕС‡РєР° СЏРІР»СЏРµС‚СЃСЏ РІС…РѕРґРѕРј РІ Р»Р°Р±РёСЂРёРЅС‚\n";
         if (v.is_exit)
-            std::cout << "Точка является выходом из лабиринта\n";
+            std::cout << "РўРѕС‡РєР° СЏРІР»СЏРµС‚СЃСЏ РІС‹С…РѕРґРѕРј РёР· Р»Р°Р±РёСЂРёРЅС‚Р°\n";
         if (v.is_feed)
-            std::cout << "Точка является кормушкой\n";
+            std::cout << "РўРѕС‡РєР° СЏРІР»СЏРµС‚СЃСЏ РєРѕСЂРјСѓС€РєРѕР№\n";
     }
-    std::cout << "Смежные точки: ";
+    std::cout << "РЎРјРµР¶РЅС‹Рµ С‚РѕС‡РєРё: ";
     alert(int_to_char(bjn, tbl[v.number]));
     std::cout << '\n';
 }
 
-// Вывод массива вершин типа Vertex
+// Р’С‹РІРѕРґ РјР°СЃСЃРёРІР° РІРµСЂС€РёРЅ С‚РёРїР° Vertex
 void alert_vertexes(const Bjn& bjn,
     const std::vector<std::vector<int>> tbl, std::vector<Vertex> vs) {
     for (auto it = vs.begin(); it != vs.end(); ++it) {
@@ -167,11 +167,11 @@ public:
             while (u < dirs.size() && dirs[current_v][u] != str_v[i]) { ++u; }
             try {
                 if (dirs[current_v][u] != str_v[i]) {
-                    throw std::invalid_argument("ОШИБКА ПРЕОБРАЗОВАНИЯ");
+                    throw std::invalid_argument("РћРЁРР‘РљРђ РџР Р•РћР‘Р РђР—РћР’РђРќРРЇ");
                 }
             } catch (std::invalid_argument & e) {
                 std::cerr << e.what() << ": ";
-                std::cerr << "НЕВОЗМОЖНО ВОССТАНОВИТЬ ПОСЛЕДОВАТЕЛЬНОСТЬ\n";
+                std::cerr << "РќР•Р’РћР—РњРћР–РќРћ Р’РћРЎРЎРўРђРќРћР’РРўР¬ РџРћРЎР›Р•Р”РћР’РђРўР•Р›Р¬РќРћРЎРўР¬\n";
                 exit(1);
             }
 
@@ -195,7 +195,7 @@ void switch_direction(std::string& dr, int MODE) {
 }
 
 void inverse_dirs(std::vector<std::string>& drs, std::string TYPE) {
-    // Если TYPE не соответствует значению 0 или 1, разрез по умолчанию вертикальный
+    // Р•СЃР»Рё TYPE РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ Р·РЅР°С‡РµРЅРёСЋ 0 РёР»Рё 1, СЂР°Р·СЂРµР· РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№
     int MODE = 1;
     if (TYPE == "horizontal") {
         MODE = 0;

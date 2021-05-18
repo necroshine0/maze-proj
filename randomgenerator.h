@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
 
-// Êëàññ ìîæíî äîïîëíèòü ðàçëè÷íûìè ðàñïðåäåëåíèÿìè èç
+// Класс можно дополнить различными распределениями из
 // https://en.cppreference.com/w/cpp/numeric/random
 
 class RandomGenerator {

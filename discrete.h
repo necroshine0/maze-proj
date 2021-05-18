@@ -70,7 +70,7 @@ public:
         Directions DIRS = mz.GetDirections();
         auto str_v = DIRS.convert_to_dirs(subv);
         int first_vert = subv.front();
-        // Теоретически можно использовать и горизонтальный тип разреза
+        // РўРµРѕСЂРµС‚РёС‡РµСЃРєРё РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Рё РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ С‚РёРї СЂР°Р·СЂРµР·Р°
         std::string type = "vertical";
 
         auto gph = mz.GetGraphList();
@@ -78,7 +78,7 @@ public:
         auto borders = mz.GetBorders(type);
         // std::cout << borders.first << ' ' << borders.second << '\n';
         // std::cout << vs[first_vert].GetX() << ' ' << vs[first_vert].GetY() << '\n';
-        // Симметричная вершина - это вершина с координатами:
+        // РЎРёРјРјРµС‚СЂРёС‡РЅР°СЏ РІРµСЂС€РёРЅР° - СЌС‚Рѕ РІРµСЂС€РёРЅР° СЃ РєРѕРѕСЂРґРёРЅР°С‚Р°РјРё:
         int x = 0, y = 0;
         if (type == "vertical") {
             x = borders.second - (vs[first_vert].GetX() - borders.first);
@@ -98,17 +98,17 @@ public:
 
         try {
             if (new_vert == -1) {
-                throw std::invalid_argument("ОШИБКА ПРЕОБРАЗОВАНИЯ");
+                throw std::invalid_argument("РћРЁРР‘РљРђ РџР Р•РћР‘Р РђР—РћР’РђРќРРЇ");
             }
         } catch (std::invalid_argument& e) {
             std::cerr << e.what() << ": ";
-            std::cerr << "НЕВОЗМОЖНО ПОСТРОИТЬ СИММЕТРИЧНЫЙ ПУТЬ ДЛЯ ПУТИ [ ";
+            std::cerr << "РќР•Р’РћР—РњРћР–РќРћ РџРћРЎРўР РћРРўР¬ РЎРРњРњР•РўР РР§РќР«Р™ РџРЈРўР¬ Р”Р›РЇ РџРЈРўР [ ";
             for (size_t i = 0; i != subv.size(); ++i) {
                 std::cerr << mz.GetBjn()[subv[i]] << ' ';
             }
 
             std::cerr << "]\n";
-            std::cerr << "ВОЗМОЖНО, ЛАБИРИНТ НЕ ЯВЛЯЕТСЯ СИММЕТРИЧНЫМ\n";
+            std::cerr << "Р’РћР—РњРћР–РќРћ, Р›РђР‘РР РРќРў РќР• РЇР’Р›РЇР•РўРЎРЇ РЎРРњРњР•РўР РР§РќР«Рњ\n";
             exit(1);
         }
 
@@ -222,11 +222,11 @@ public:
     discrete_vector(double p1, double p2, double p3, double p4) {
         try {
             if ((p1 + p2 + p3 + p4) > 1) {
-                throw std::invalid_argument("ЗАДАННЫЕ ВЕРОЯТНОСТИ НЕ СООТВЕТСТВУЮТ ТРЕБОВАНИЯМ");
+                throw std::invalid_argument("Р—РђР”РђРќРќР«Р• Р’Р•Р РћРЇРўРќРћРЎРўР РќР• РЎРћРћРўР’Р•РўРЎРўР’РЈР®Рў РўР Р•Р‘РћР’РђРќРРЇРњ");
             }
         } catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            std::cerr << "РЎСѓРјРјР° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№ РЅРµ РґРѕР»Р¶РЅР° РїСЂРµРІС‹С€Р°С‚СЊ РµРґРёРЅРёС†Сѓ\n";
             exit(1);
         }
 
@@ -264,12 +264,12 @@ public:
 
         try {
             if ((pi + pe - prob) < 0.) {
-                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА ИНВЕРСИИ");
+                throw std::invalid_argument("РќР•Р’РћР—РњРћР–РќРћ РР—РњР•РќРРўР¬ Р’Р•Р РћРЇРўРќРћРЎРўР¬ РћРџР•Р РђРўРћР Рђ РРќР’Р•Р РЎРР");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            std::cerr << "РЎСѓРјРјР° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№ РЅРµ РґРѕР»Р¶РЅР° РїСЂРµРІС‹С€Р°С‚СЊ РµРґРёРЅРёС†Сѓ\n";
             exit(1);
         }
 
@@ -296,12 +296,12 @@ public:
 
         try {
             if ((ps + pe - prob) < 0.) {
-                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА СИММЕТРИИ");
+                throw std::invalid_argument("РќР•Р’РћР—РњРћР–РќРћ РР—РњР•РќРРўР¬ Р’Р•Р РћРЇРўРќРћРЎРўР¬ РћРџР•Р РђРўРћР Рђ РЎРРњРњР•РўР РР");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            std::cerr << "РЎСѓРјРјР° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№ РЅРµ РґРѕР»Р¶РЅР° РїСЂРµРІС‹С€Р°С‚СЊ РµРґРёРЅРёС†Сѓ\n";
             exit(1);
         }
 
@@ -328,12 +328,12 @@ public:
 
         try {
             if ((pg + pe - prob) < 0.) {
-                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА СЖАТИЯ");
+                throw std::invalid_argument("РќР•Р’РћР—РњРћР–РќРћ РР—РњР•РќРРўР¬ Р’Р•Р РћРЇРўРќРћРЎРўР¬ РћРџР•Р РђРўРћР Рђ РЎР–РђРўРРЇ");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            std::cerr << "РЎСѓРјРјР° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№ РЅРµ РґРѕР»Р¶РЅР° РїСЂРµРІС‹С€Р°С‚СЊ РµРґРёРЅРёС†Сѓ\n";
             exit(1);
         }
 
@@ -360,12 +360,12 @@ public:
 
         try {
             if ((pr + pe - prob) < 0.) {
-                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА КОЛЬЦА");
+                throw std::invalid_argument("РќР•Р’РћР—РњРћР–РќРћ РР—РњР•РќРРўР¬ Р’Р•Р РћРЇРўРќРћРЎРўР¬ РћРџР•Р РђРўРћР Рђ РљРћР›Р¬Р¦Рђ");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            std::cerr << "РЎСѓРјРјР° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№ РЅРµ РґРѕР»Р¶РЅР° РїСЂРµРІС‹С€Р°С‚СЊ РµРґРёРЅРёС†Сѓ\n";
             exit(1);
         }
 
@@ -389,11 +389,11 @@ public:
     void SetProbs(double ps, double pi, double pg, double pr) {
         try {
             if (ps + pi + pg + pr > 1.) {
-                throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
+                throw std::invalid_argument("РќР•Р’РђР›РР”РќР«Р™ РђР Р“РЈРњР•РќРў");
             }
         } catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            std::cerr << "РЎСѓРјРјР° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№ РЅРµ РґРѕР»Р¶РЅР° РїСЂРµРІС‹С€Р°С‚СЊ РµРґРёРЅРёС†Сѓ\n";
             exit(1);
         }
 
@@ -420,12 +420,12 @@ public:
     void SetProbs(std::vector<double> probs) {
         try {
             if (probs.size() > 4) {
-                throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
+                throw std::invalid_argument("РќР•Р’РђР›РР”РќР«Р™ РђР Р“РЈРњР•РќРў");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Неверный размер переданного вектора\n";
+            std::cerr << "РќРµРІРµСЂРЅС‹Р№ СЂР°Р·РјРµСЂ РїРµСЂРµРґР°РЅРЅРѕРіРѕ РІРµРєС‚РѕСЂР°\n";
             exit(1);
         }
 
@@ -433,12 +433,12 @@ public:
         for (auto x : probs) { s += x;  }
         try {
             if (s > 1.) {
-                throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
+                throw std::invalid_argument("РќР•Р’РђР›РР”РќР«Р™ РђР Р“РЈРњР•РќРў");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
-            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            std::cerr << "РЎСѓРјРјР° Р·РЅР°С‡РµРЅРёР№ РІСЃРµС… РІРµСЂРѕСЏС‚РЅРѕСЃС‚РµР№ РЅРµ РґРѕР»Р¶РЅР° РїСЂРµРІС‹С€Р°С‚СЊ РµРґРёРЅРёС†Сѓ\n";
             exit(1);
         }
 
@@ -492,11 +492,11 @@ std::vector<char> gen_discrete_path(const Maze& mz,
 
         DV[k]->method(mz, new_seq, LENGHT);
 
-        // Посмотрим на последнюю полученную вершину
-        // Если есть ребро с i+1-ой, то ок
-        // Иначе нам надо прийти в i+1, 
-        // желательно по кратчайшему пути
-        // В целом, можно это и сделать и без проверки существования ребра
+        // РџРѕСЃРјРѕС‚СЂРёРј РЅР° РїРѕСЃР»РµРґРЅСЋСЋ РїРѕР»СѓС‡РµРЅРЅСѓСЋ РІРµСЂС€РёРЅСѓ
+        // Р•СЃР»Рё РµСЃС‚СЊ СЂРµР±СЂРѕ СЃ i+1-РѕР№, С‚Рѕ РѕРє
+        // РРЅР°С‡Рµ РЅР°Рј РЅР°РґРѕ РїСЂРёР№С‚Рё РІ i+1, 
+        // Р¶РµР»Р°С‚РµР»СЊРЅРѕ РїРѕ РєСЂР°С‚С‡Р°Р№С€РµРјСѓ РїСѓС‚Рё
+        // Р’ С†РµР»РѕРј, РјРѕР¶РЅРѕ СЌС‚Рѕ Рё СЃРґРµР»Р°С‚СЊ Рё Р±РµР· РїСЂРѕРІРµСЂРєРё СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ СЂРµР±СЂР°
         std::vector<int> bridge = mz.GetTensor()(new_seq.back(), seq[i + 1]);
         
         if (bridge.size() == 0) { continue; }
@@ -515,7 +515,7 @@ void gen_paths_file(const std::string& filename, const Maze& mz,
     std::ofstream file(filename, std::ios_base::trunc | std::ios_base::out);
     try {
         if (!file.is_open())
-            throw std::runtime_error("НЕ УДАЛОСЬ ОТКРЫТЬ ФАЙЛ");
+            throw std::runtime_error("РќР• РЈР”РђР›РћРЎР¬ РћРўРљР Р«РўР¬ Р¤РђР™Р›");
     } catch (std::runtime_error& e) {
         std::cerr << e.what() << '\n';
         exit(1);

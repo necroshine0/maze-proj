@@ -10,7 +10,7 @@
 using graph_int = std::vector<std::vector<int>>;
 extern const int INF;
 
-// Вывод вектора
+// Р’С‹РІРѕРґ РІРµРєС‚РѕСЂР°
 template <typename T>
 void alert(const std::vector<T>& v) {
     for (size_t i = 0; i != v.size(); ++i) {
@@ -20,7 +20,7 @@ void alert(const std::vector<T>& v) {
     std::cout << '\n';
 }
 
-// Вывод таблицы
+// Р’С‹РІРѕРґ С‚Р°Р±Р»РёС†С‹
 template <typename T>
 void alert(const std::vector<std::vector<T>>& tbl) {
     for (size_t i = 0; i < tbl.size(); ++i) {
@@ -32,7 +32,7 @@ void alert(const std::vector<std::vector<T>>& tbl) {
     }
 }
 
-// Вывод таблицы в символьном формате
+// Р’С‹РІРѕРґ С‚Р°Р±Р»РёС†С‹ РІ СЃРёРјРІРѕР»СЊРЅРѕРј С„РѕСЂРјР°С‚Рµ
 template <typename T>
 void alert(const std::vector<std::vector<T>>& tbl, const Bjn& bjn) {
     for (size_t i = 0; i < tbl.size(); ++i) {
@@ -44,7 +44,7 @@ void alert(const std::vector<std::vector<T>>& tbl, const Bjn& bjn) {
     }
 }
 
-// Вывод матрицы смежности
+// Р’С‹РІРѕРґ РјР°С‚СЂРёС†С‹ СЃРјРµР¶РЅРѕСЃС‚Рё
 template <typename T>
 void alert_adj_table(const std::vector<std::vector<T>>& tbl, const Bjn& bjn) {
     std::cout << " \t";
@@ -72,7 +72,7 @@ void alert_adj_table(const std::vector<std::vector<T>>& tbl, const Bjn& bjn) {
     std::cout << '\n';
 }
 
-// Как в питоне
+// РљР°Рє РІ РїРёС‚РѕРЅРµ
 std::vector<std::string> split_str(const std::string& str, char delimiter) {
     std::vector<std::string> v;
     std::string subline;
