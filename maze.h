@@ -78,15 +78,15 @@ public:
     }
 
     std::vector<int> gen_trivial_path(char start_c) const {
-        int current_v = bjn[start_c];
+        size_t current_v = bjn[start_c];
         try {
             if (!vertexes[current_v].is_entry) {
-                throw std::invalid_argument("ÍÅÂÀËÈÄÍÛÉ ÀĞÃÓÌÅÍÒ");
+                throw std::invalid_argument("ĞĞ•Ğ’ĞĞ›Ğ˜Ğ”ĞĞ«Ğ™ ĞĞ Ğ“Ğ£ĞœĞ•ĞĞ¢");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << ": ";
-            std::cerr << "ÑÒÀĞÒÎÂÀß ÂÅĞØÈÍÀ ÄÎËÆÍÛ ßÂËßÒÜÑß ÒÎ×ÊÎÉ ÂÕÎÄÀ Â ËÀÁÈĞÈÍÒ\n";
+            std::cerr << "Ğ¡Ğ¢ĞĞ Ğ¢ĞĞ’ĞĞ¯ Ğ’Ğ•Ğ Ğ¨Ğ˜ĞĞ Ğ”ĞĞ›Ğ–ĞĞ« Ğ¯Ğ’Ğ›Ğ¯Ğ¢Ğ¬Ğ¡Ğ¯ Ğ¢ĞĞ§ĞšĞĞ™ Ğ’Ğ¥ĞĞ”Ğ Ğ’ Ğ›ĞĞ‘Ğ˜Ğ Ğ˜ĞĞ¢\n";
             exit(1);
         }
 
@@ -95,13 +95,13 @@ public:
 
         path.push_back(current_v);
         while (!vertexes[current_v].is_feed) {
-            int u = random_choice(gph[current_v]);
+            size_t u = random_choice(gph[current_v]);
             current_v = gph[current_v][u];
             path.push_back(current_v);
         }
 
         while (!vertexes[current_v].is_exit) {
-            int u = random_choice(gph[current_v]);
+            size_t u = random_choice(gph[current_v]);
             current_v = gph[current_v][u];
             path.push_back(current_v);
         }
@@ -110,7 +110,7 @@ public:
     }
 };
 
-// Ôàéë ñîõğàíÿòü â ANSI
+// Ğ¤Ğ°Ğ¹Ğ» ÑĞ¾Ñ…Ñ€Ğ°Ğ½ÑÑ‚ÑŒ Ğ² ANSI
 Maze Construct_Maze(std::string filename) {
     setlocale(LC_ALL, "rus");
     std::ifstream file;
@@ -118,7 +118,7 @@ Maze Construct_Maze(std::string filename) {
 
     try {
         if (!file.is_open())
-            throw std::runtime_error("ÍÅ ÓÄÀËÎÑÜ ÎÒÊĞÛÒÜ ÔÀÉË");
+            throw std::runtime_error("ĞĞ• Ğ£Ğ”ĞĞ›ĞĞ¡Ğ¬ ĞĞ¢ĞšĞ Ğ«Ğ¢Ğ¬ Ğ¤ĞĞ™Ğ›");
     } catch (std::runtime_error & e) {
         std::cerr << e.what() << '\n';
         exit(1);
@@ -148,7 +148,6 @@ Maze Construct_Maze(std::string filename) {
           for (size_t j = 0; j != vs.size(); ++j) {
               gph[bjn[V]].push_back(bjn[vs[j]]);
           }
-
     }
 
     file.close();
