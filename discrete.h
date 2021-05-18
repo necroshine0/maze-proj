@@ -33,8 +33,8 @@ public:
         probability = prob;
     }
 
-    const double GetProb() const { return probability; }
-    void SetProb(double prob) { probability = prob; }
+    virtual const double GetProb() const { return probability; }
+    virtual void SetProb(double prob) { probability = prob; }
 
     virtual void method(const Maze& mz, std::vector<int>& v, size_t subseq_size) const {}
     virtual void name() const {}
@@ -79,7 +79,7 @@ public:
         // std::cout << borders.first << ' ' << borders.second << '\n';
         // std::cout << vs[first_vert].GetX() << ' ' << vs[first_vert].GetY() << '\n';
         // Симметричная вершина - это вершина с координатами:
-        int x, y;
+        int x = 0, y = 0;
         if (type == "vertical") {
             x = borders.second - (vs[first_vert].GetX() - borders.first);
             y = vs[first_vert].GetY();
@@ -161,7 +161,7 @@ public:
         int current_v = fixed_v;
 
         while (true) {
-            int u = random_choice(gph[current_v]);
+            size_t u = random_choice(gph[current_v]);
             current_v = gph[current_v][u];
             v.push_back(current_v);
 
@@ -204,6 +204,7 @@ public:
 class discrete_vector {
 private:
     std::vector<std::unique_ptr<DiscreteOperator>> DOs;
+    size_t indexes[5]; // ISGRE
 
 public:
     discrete_vector() {
@@ -213,14 +214,17 @@ public:
         DOs.push_back(std::unique_ptr<DiscreteOperator>(new Grip(.0)));
         DOs.push_back(std::unique_ptr<DiscreteOperator>(new Ring(.0)));
         DOs.push_back(std::unique_ptr<DiscreteOperator>(new Empty(1.)));
+        for (size_t i = 0; i != 5; ++i) {
+            indexes[i] = i;
+        }
+
     }
     discrete_vector(double p1, double p2, double p3, double p4) {
         try {
             if ((p1 + p2 + p3 + p4) > 1) {
                 throw std::invalid_argument("ЗАДАННЫЕ ВЕРОЯТНОСТИ НЕ СООТВЕТСТВУЮТ ТРЕБОВАНИЯМ");
             }
-        }
-        catch (std::invalid_argument& e) {
+        } catch (std::invalid_argument& e) {
             std::cerr << e.what() << '\n';
             std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
             exit(1);
@@ -239,10 +243,228 @@ public:
                 return (one->GetProb() < two->GetProb());
             }
         );
+
+        for (size_t i = 0; i != 5; ++i) {
+            if (typeid(*DOs[i]) == typeid(Inverse)) { indexes[0] = i; }
+            else if (typeid(*DOs[i]) == typeid(Symmetry)) { indexes[1] = i; }
+            else if (typeid(*DOs[i]) == typeid(Grip)) { indexes[2] = i; }
+            else if (typeid(*DOs[i]) == typeid(Ring)) { indexes[3] = i; }
+            else { indexes[4] = i; }
+        }
     }
 
     const std::unique_ptr<DiscreteOperator>& operator[] (size_t j) const { return DOs[j]; }
-    
+    void SetInverseProb(double prob) {
+        // pi + pe = a
+        // pi -> prob
+        // prob + pe' = pi + pe = a
+        //  pe' = pi + pe - prob
+        double pi = DOs[indexes[0]]->GetProb();
+        double pe = DOs[indexes[4]]->GetProb();
+
+        try {
+            if ((pi + pe - prob) < 0.) {
+                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА ИНВЕРСИИ");
+            }
+        }
+        catch (std::invalid_argument& e) {
+            std::cerr << e.what() << '\n';
+            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            exit(1);
+        }
+
+        DOs[indexes[0]]->SetProb(prob);
+        DOs[indexes[4]]->SetProb(pi + pe - prob);
+        std::sort(DOs.begin(), DOs.end(),
+            [](const std::unique_ptr<DiscreteOperator>& one,
+                const std::unique_ptr<DiscreteOperator>& two) -> bool {
+                return (one->GetProb() < two->GetProb());
+            }
+        );
+
+        for (size_t i = 0; i != 5; ++i) {
+            if (typeid(*DOs[i]) == typeid(Inverse)) { indexes[0] = i; }
+            else if (typeid(*DOs[i]) == typeid(Symmetry)) { indexes[1] = i; }
+            else if (typeid(*DOs[i]) == typeid(Grip)) { indexes[2] = i; }
+            else if (typeid(*DOs[i]) == typeid(Ring)) { indexes[3] = i; }
+            else { indexes[4] = i; }
+        }
+    }
+    void SetSymmetryProb(double prob) {
+        double ps = DOs[indexes[1]]->GetProb();
+        double pe = DOs[indexes[4]]->GetProb();
+
+        try {
+            if ((ps + pe - prob) < 0.) {
+                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА СИММЕТРИИ");
+            }
+        }
+        catch (std::invalid_argument& e) {
+            std::cerr << e.what() << '\n';
+            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            exit(1);
+        }
+
+        DOs[indexes[1]]->SetProb(prob);
+        DOs[indexes[4]]->SetProb(ps + pe - prob);
+        std::sort(DOs.begin(), DOs.end(),
+            [](const std::unique_ptr<DiscreteOperator>& one,
+                const std::unique_ptr<DiscreteOperator>& two) -> bool {
+                return (one->GetProb() < two->GetProb());
+            }
+        );
+
+        for (size_t i = 0; i != 5; ++i) {
+            if (typeid(*DOs[i]) == typeid(Inverse)) { indexes[0] = i; }
+            else if (typeid(*DOs[i]) == typeid(Symmetry)) { indexes[1] = i; }
+            else if (typeid(*DOs[i]) == typeid(Grip)) { indexes[2] = i; }
+            else if (typeid(*DOs[i]) == typeid(Ring)) { indexes[3] = i; }
+            else { indexes[4] = i; }
+        }
+    }
+    void SetGripProb(double prob) {
+        double pg = DOs[indexes[2]]->GetProb();
+        double pe = DOs[indexes[4]]->GetProb();
+
+        try {
+            if ((pg + pe - prob) < 0.) {
+                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА СЖАТИЯ");
+            }
+        }
+        catch (std::invalid_argument& e) {
+            std::cerr << e.what() << '\n';
+            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            exit(1);
+        }
+
+        DOs[indexes[2]]->SetProb(prob);
+        DOs[indexes[4]]->SetProb(pg + pe - prob);
+        std::sort(DOs.begin(), DOs.end(),
+            [](const std::unique_ptr<DiscreteOperator>& one,
+                const std::unique_ptr<DiscreteOperator>& two) -> bool {
+                return (one->GetProb() < two->GetProb());
+            }
+        );
+
+        for (size_t i = 0; i != 5; ++i) {
+            if (typeid(*DOs[i]) == typeid(Inverse)) { indexes[0] = i; }
+            else if (typeid(*DOs[i]) == typeid(Symmetry)) { indexes[1] = i; }
+            else if (typeid(*DOs[i]) == typeid(Grip)) { indexes[2] = i; }
+            else if (typeid(*DOs[i]) == typeid(Ring)) { indexes[3] = i; }
+            else { indexes[4] = i; }
+        }
+    }
+    void SetRingProb(double prob) {
+        double pr = DOs[indexes[3]]->GetProb();
+        double pe = DOs[indexes[4]]->GetProb();
+
+        try {
+            if ((pr + pe - prob) < 0.) {
+                throw std::invalid_argument("НЕВОЗМОЖНО ИЗМЕНИТЬ ВЕРОЯТНОСТЬ ОПЕРАТОРА КОЛЬЦА");
+            }
+        }
+        catch (std::invalid_argument& e) {
+            std::cerr << e.what() << '\n';
+            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            exit(1);
+        }
+
+        DOs[indexes[3]]->SetProb(prob);
+        DOs[indexes[4]]->SetProb(pr + pe - prob);
+        std::sort(DOs.begin(), DOs.end(),
+            [](const std::unique_ptr<DiscreteOperator>& one,
+                const std::unique_ptr<DiscreteOperator>& two) -> bool {
+                return (one->GetProb() < two->GetProb());
+            }
+        );
+
+        for (size_t i = 0; i != 5; ++i) {
+            if (typeid(*DOs[i]) == typeid(Inverse)) { indexes[0] = i; }
+            else if (typeid(*DOs[i]) == typeid(Symmetry)) { indexes[1] = i; }
+            else if (typeid(*DOs[i]) == typeid(Grip)) { indexes[2] = i; }
+            else if (typeid(*DOs[i]) == typeid(Ring)) { indexes[3] = i; }
+            else { indexes[4] = i; }
+        }
+    }
+    void SetProbs(double ps, double pi, double pg, double pr) {
+        try {
+            if (ps + pi + pg + pr > 1.) {
+                throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
+            }
+        } catch (std::invalid_argument& e) {
+            std::cerr << e.what() << '\n';
+            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            exit(1);
+        }
+
+        DOs[indexes[0]]->SetProb(ps);
+        DOs[indexes[1]]->SetProb(pi);
+        DOs[indexes[2]]->SetProb(pg);
+        DOs[indexes[3]]->SetProb(pr);
+        DOs[indexes[4]]->SetProb(1. - ps - pi - pg - pr);
+        std::sort(DOs.begin(), DOs.end(),
+            [](const std::unique_ptr<DiscreteOperator>& one,
+                const std::unique_ptr<DiscreteOperator>& two) -> bool {
+                return (one->GetProb() < two->GetProb());
+            }
+        );
+
+        for (size_t i = 0; i != 5; ++i) {
+            if (typeid(*DOs[i]) == typeid(Inverse)) { indexes[0] = i; }
+            else if (typeid(*DOs[i]) == typeid(Symmetry)) { indexes[1] = i; }
+            else if (typeid(*DOs[i]) == typeid(Grip)) { indexes[2] = i; }
+            else if (typeid(*DOs[i]) == typeid(Ring)) { indexes[3] = i; }
+            else { indexes[4] = i; }
+        }
+    }
+    void SetProbs(std::vector<double> probs) {
+        try {
+            if (probs.size() > 4) {
+                throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
+            }
+        }
+        catch (std::invalid_argument& e) {
+            std::cerr << e.what() << '\n';
+            std::cerr << "Неверный размер переданного вектора\n";
+            exit(1);
+        }
+
+        double s = 0;
+        for (auto x : probs) { s += x;  }
+        try {
+            if (s > 1.) {
+                throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
+            }
+        }
+        catch (std::invalid_argument& e) {
+            std::cerr << e.what() << '\n';
+            std::cerr << "Сумма значений всех вероятностей не должна превышать единицу\n";
+            exit(1);
+        }
+
+        for (size_t i = 0; i != 5; ++i) {
+            DOs[i]->SetProb(0.);
+        }
+        for (size_t i = 0; i != probs.size(); ++i) {
+            DOs[indexes[i]]->SetProb(probs[i]);
+        }
+
+        DOs[indexes[4]]->SetProb(1. - s);
+        std::sort(DOs.begin(), DOs.end(),
+            [](const std::unique_ptr<DiscreteOperator>& one,
+                const std::unique_ptr<DiscreteOperator>& two) -> bool {
+                return (one->GetProb() < two->GetProb());
+            }
+        );
+
+        for (size_t i = 0; i != 5; ++i) {
+            if (typeid(*DOs[i]) == typeid(Inverse)) { indexes[0] = i; }
+            else if (typeid(*DOs[i]) == typeid(Symmetry)) { indexes[1] = i; }
+            else if (typeid(*DOs[i]) == typeid(Grip)) { indexes[2] = i; }
+            else if (typeid(*DOs[i]) == typeid(Ring)) { indexes[3] = i; }
+            else { indexes[4] = i; }
+        }
+    }
     size_t rand_choice() const {
         double rnd = gen.d_udist(0, 1);
         size_t i = 0;
