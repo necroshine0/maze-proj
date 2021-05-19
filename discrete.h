@@ -477,9 +477,8 @@ public:
     }
 };
 
-std::vector<char> gen_discrete_path(const Maze& mz,
-        const discrete_vector& DV,
-            const std::vector<int>& seq) {
+std::vector<int> gen_discrete_path(const Maze& mz,
+        const discrete_vector& DV, const std::vector<int>& seq) {
 
     std::vector<int> new_seq;
     new_seq.reserve(seq.size());
@@ -506,11 +505,11 @@ std::vector<char> gen_discrete_path(const Maze& mz,
     }
 
     new_seq.push_back(seq.back());
-    return int_to_char(mz.GetBjn(), new_seq);
+    return new_seq;
 }
 
 void gen_paths_file(const std::string& filename, const Maze& mz,
-    const discrete_vector& DOs, size_t trials, const std::vector<int>& seq) {
+    const discrete_vector& DOs, size_t trials, std::vector<int> seq) {
 
     std::ofstream file(filename, std::ios_base::trunc | std::ios_base::out);
     try {
@@ -526,8 +525,9 @@ void gen_paths_file(const std::string& filename, const Maze& mz,
     file << '\n';
 
     for (size_t i = 0; i < trials; ++i) {
-        auto v = gen_discrete_path(mz, DOs, seq);
-        for (auto it = v.begin(); it != v.end(); ++it) { file << *it; }
+        seq = gen_discrete_path(mz, DOs, seq);
+        auto seq_chars = int_to_char(mz.GetBjn(), seq);
+        for (auto it = seq_chars.begin(); it != seq_chars.end(); ++it) { file << *it; }
         file << '\n';
     }
 
