@@ -5,6 +5,13 @@
 #include <fstream>
 #include <vector>
 #include <cstring>
+#include "maze.h"
+#include "bijection.h"
+#include "discrete.h"
+#include "help_functions.h"
+
+#define all(v) (v).begin(), (v).end()
+
 // Вход: файл с последовательностями реальной мыши; число последних
 // Выход: массив этих последовательностей
 // Возможно, придется добавить парсинг, но пока что работаем с .txt,
@@ -46,6 +53,8 @@ std::vector<std::string> read_file(const std::string& filename, size_t n) {
 // https://rosettacode.org/wiki/Levenshtein_distance#C.2B.2B
 // Compute Levenshtein Distance
 // Martin Ettl, 2012-10-05
+// T = { string, VString }
+
 size_t LevenshteinDistance(const std::string& s1, const std::string& s2) {
     size_t m(s1.size()), n(s2.size());
 
@@ -101,4 +110,74 @@ size_t MinimalLevenshteinDistance(std::string filename,
 
     auto last_seqs = read_file(filename, n);
     return MinimalLevenshteinDistance(last_seqs, modelmouse);
+}
+
+std::vector<std::vector<double>> gen_grid(double step, double u_bound) {
+    std::vector<std::vector<double>> grid;
+    grid.reserve(1000);
+    std::vector<double> probs(4);
+
+    probs[0] = 0.;
+    while (probs[0] <= u_bound) {
+        probs[1] = 0.;
+        while (probs[1] <= u_bound) {
+            probs[2] = 0.;
+            while (probs[2] <= u_bound) {
+                probs[3] = 0.;
+                // Это условие сокращает число итераций цикла с 10000 до 632 при u_bound = 0.9
+                while (probs[3] <= (0.9 - probs[0] - probs[1] - probs[2] ) ) {
+                    probs[3] += step;
+                    grid.push_back(probs);
+                }
+
+                probs[2] += step;
+            }
+
+            probs[1] += step;
+        }
+
+        probs[0] += step;
+    }
+
+    return grid;
+}
+
+// Вход: лабиринт; число генерируемых последовательностей; множество реальных последовательностей;
+// массив всех мозможных веростностей; дискретный вектор (неконст);  первую строку (реальной мыши); eps
+// Возврат: оптимальные вероятности
+std::vector<double> learn(const Maze& mz,
+                          size_t trials,
+                          const std::vector<std::string> U,
+                          const std::vector<std::vector<double>> grid,
+                          discrete_vector& DV,
+                          const std::string& U_1,
+                          size_t eps) {
+
+    size_t last_step = -1;
+    auto U_1_int = char_to_int(mz.GetBjn(), std::vector<char>(all(U_1)) );
+    for (size_t k = 0; k != grid.size(); ++k) {
+
+        DV.SetProbs(grid[k]);
+        // G - множество дискретных последовательностей размера (trials + 1)
+        auto G = gen_paths_file_str(mz, DV, trials, U_1_int);
+
+        // Проверяем на каком пути из G_n у нас останавливается. Если найдем, то закинем в наш особый вектор
+        for (size_t i = 1; i < trials; ++i) {
+            size_t res = MinimalLevenshteinDistance(U, G[i]);
+            if (res < eps) {
+                last_step = k;
+                break;
+            }
+        }
+    }
+
+    if (last_step != -1) {
+        std::cout << "Полученны оптимальные значения вероятностей на шаге " << last_step << '\n';
+        std::cout << "Их значения: ";
+        alert(grid[last_step]);
+    } else {
+        std::cout << "Не удалось получить оптимальные значения вероятностей\n";
+    }
+
+    return std::vector<double>({ 0., 0., 0., 0. });
 }
