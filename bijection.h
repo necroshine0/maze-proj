@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+#include <string>
 
 class Bjn {
 private:
@@ -35,7 +36,11 @@ public:
 
     friend std::vector<int> char_to_int(const Bjn& bjn,
         const std::vector<char>& path_char);
+    friend std::vector<int> char_to_int(const Bjn& bjn,
+        const std::string& path_char);
     friend std::vector<char> int_to_char(const Bjn& bjn,
+        const std::vector<int>& path_int);
+    friend std::string int_to_char_str(const Bjn& bjn,
         const std::vector<int>& path_int);
 };
 
@@ -48,8 +53,27 @@ std::vector<int> char_to_int(const Bjn& bjn, const std::vector<char>& path_char)
     return path_int;
 }
 
+std::vector<int> char_to_int(const Bjn& bjn, const std::string& path_char) {
+    std::vector<int> path_int(path_char.size());
+    for (size_t i = 0; i != path_int.size(); ++i) {
+        path_int[i] = bjn.digs.at(path_char[i]);
+    }
+
+    return path_int;
+}
+
 std::vector<char> int_to_char(const Bjn& bjn, const std::vector<int>& path_int) {
     std::vector<char> path_char(path_int.size());
+    for (size_t i = 0; i != path_int.size(); ++i) {
+        path_char[i] = bjn.symbs.at(path_int[i]);
+    }
+
+    return path_char;
+}
+
+std::string int_to_char_str(const Bjn& bjn, const std::vector<int>& path_int) {
+    std::string path_char;
+    path_char.resize(path_int.size());
     for (size_t i = 0; i != path_int.size(); ++i) {
         path_char[i] = bjn.symbs.at(path_int[i]);
     }
