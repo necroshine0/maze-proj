@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <string>
 #include "help_functions.h"
 #include "tensor.h"
 #include "maze.h"
@@ -508,13 +509,16 @@ std::vector<int> gen_discrete_path(const Maze& mz,
     return new_seq;
 }
 
-void gen_paths_file(const std::string& filename, const Maze& mz,
+// Функция возвращает вектор последовательностей в числовом виде,
+// Вместе с этим записывает из в файл в буквенном виде
+// Файл всегда называется sequences.txt, при отсутствии он будет создан
+std::vector<std::string> gen_paths_file_str(const Maze& mz,
     const discrete_vector& DOs, size_t trials, std::vector<int> seq) {
 
-    std::ofstream file(filename, std::ios_base::trunc | std::ios_base::out);
+    std::ofstream file("sequences.txt", std::ios_base::out);
     try {
         if (!file.is_open())
-            throw std::runtime_error("НЕ УДАЛОСЬ ОТКРЫТЬ ФАЙЛ");
+            throw std::runtime_error("НЕ УДАЛОСЬ ОТКРЫТЬ ИЛИ СОЗДАТЬ ФАЙЛ");
     } catch (std::runtime_error& e) {
         std::cerr << e.what() << '\n';
         exit(1);
@@ -524,12 +528,51 @@ void gen_paths_file(const std::string& filename, const Maze& mz,
     for (auto it = tmp.begin(); it != tmp.end(); ++it) { file << *it; }
     file << '\n';
 
+    std::vector<std::vector<int>> paths;
+    paths.reserve(trials + 1);
+    paths.push_back(seq);
     for (size_t i = 0; i < trials; ++i) {
         seq = gen_discrete_path(mz, DOs, seq);
+        paths.push_back(seq);
+        std::string seq_chars = int_to_char_str(mz.GetBjn(), seq);
+        for (auto it = seq_chars.begin(); it != seq_chars.end(); ++it) { file << *it; }
+        file << '\n';
+    }
+
+    // Последовательности будут разделены переносом строки
+    file << '\n';
+    file.close();
+}
+
+std::vector<std::vector<int>> gen_paths_file_int(const Maze& mz,
+    const discrete_vector& DOs, size_t trials, std::vector<int> seq) {
+
+    std::ofstream file("sequences.txt", std::ios_base::out);
+    try {
+        if (!file.is_open())
+            throw std::runtime_error("НЕ УДАЛОСЬ ОТКРЫТЬ ИЛИ СОЗДАТЬ ФАЙЛ");
+    }
+    catch (std::runtime_error& e) {
+        std::cerr << e.what() << '\n';
+        exit(1);
+    }
+
+    auto tmp = int_to_char(mz.GetBjn(), seq);
+    for (auto it = tmp.begin(); it != tmp.end(); ++it) { file << *it; }
+    file << '\n';
+
+    std::vector<std::vector<int>> paths;
+    paths.reserve(trials + 1);
+    paths.push_back(seq);
+    for (size_t i = 0; i < trials; ++i) {
+        seq = gen_discrete_path(mz, DOs, seq);
+        paths.push_back(seq);
         auto seq_chars = int_to_char(mz.GetBjn(), seq);
         for (auto it = seq_chars.begin(); it != seq_chars.end(); ++it) { file << *it; }
         file << '\n';
     }
 
+    // Последовательности будут разделены переносом строки
+    file << '\n';
     file.close();
 }
