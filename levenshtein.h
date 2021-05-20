@@ -166,11 +166,12 @@ std::pair<std::vector<double>, int> learn(const Maze& mz,
             size_t res = MinimalLevenshteinDistance(U, G[i]);
             if (res < eps) {
                 last_step = k;
-                break;
+                goto out;
             }
         }
     }
 
+    out:
     if (last_step != -1) {
         std::cout << "Полученны оптимальные значения вероятностей на шаге " << last_step << '\n';
         std::cout << "Их значения: ";
