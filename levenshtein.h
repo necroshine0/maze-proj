@@ -144,8 +144,9 @@ std::vector<std::vector<double>> gen_grid(double step, double u_bound) {
 
 // Вход: лабиринт; число генерируемых последовательностей; множество реальных последовательностей;
 // массив всех мозможных веростностей; дискретный вектор (неконст);  первую строку (реальной мыши); eps
-// Возврат: оптимальные вероятности
-std::vector<double> learn(const Maze& mz,
+// Возврат: оптимальные вероятности и шаг, на котором они были получены в случае успеха
+//          иначе: вектор нулей и -1
+std::pair<std::vector<double>, int> learn(const Maze& mz,
                           size_t trials,
                           const std::vector<std::string> U,
                           const std::vector<std::vector<double>> grid,
@@ -153,7 +154,7 @@ std::vector<double> learn(const Maze& mz,
                           const std::string& U_1,
                           size_t eps) {
 
-    size_t last_step = -1;
+    int last_step = -1;
     auto U_1_int = char_to_int(mz.GetBjn(), std::vector<char>(all(U_1)) );
     for (size_t k = 0; k != grid.size(); ++k) {
 
@@ -161,7 +162,6 @@ std::vector<double> learn(const Maze& mz,
         // G - множество дискретных последовательностей размера (trials + 1)
         auto G = gen_paths_file_str(mz, DV, trials, U_1_int);
 
-        // Проверяем на каком пути из G_n у нас останавливается. Если найдем, то закинем в наш особый вектор
         for (size_t i = 1; i < trials; ++i) {
             size_t res = MinimalLevenshteinDistance(U, G[i]);
             if (res < eps) {
@@ -175,9 +175,10 @@ std::vector<double> learn(const Maze& mz,
         std::cout << "Полученны оптимальные значения вероятностей на шаге " << last_step << '\n';
         std::cout << "Их значения: ";
         alert(grid[last_step]);
+        return std::make_pair(grid[last_step], last_step);
     } else {
         std::cout << "Не удалось получить оптимальные значения вероятностей\n";
     }
 
-    return std::vector<double>({ 0., 0., 0., 0. });
+    return std::make_pair(std::vector<double>({ 0., 0., 0., 0. }), -1);
 }
