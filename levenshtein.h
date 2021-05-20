@@ -162,7 +162,7 @@ std::pair<std::vector<double>, int> learn(const Maze& mz,
         // G - множество дискретных последовательностей размера (trials + 1)
         auto G = gen_paths_file_str(mz, DV, trials, U_1_int);
 
-        for (size_t i = 1; i < trials; ++i) {
+        for (size_t i = 1; i < trials + 1; ++i) {
             size_t res = MinimalLevenshteinDistance(U, G[i]);
             if (res < eps) {
                 last_step = k;
