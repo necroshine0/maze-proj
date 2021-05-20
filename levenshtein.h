@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <cstring>
+#include <map>
 #include "maze.h"
 #include "bijection.h"
 #include "discrete.h"
@@ -55,7 +56,7 @@ std::vector<std::string> read_file(const std::string& filename, size_t n) {
 // Martin Ettl, 2012-10-05
 // T = { string, VString }
 
-size_t LevenshteinDistance(const std::string& s1, const std::string& s2) {
+int LevenshteinDistance(const std::string& s1, const std::string& s2) {
     size_t m(s1.size()), n(s2.size());
 
     if (m == 0) { return n; }
@@ -64,7 +65,7 @@ size_t LevenshteinDistance(const std::string& s1, const std::string& s2) {
     // allocation below is not ISO-compliant,
     // it won't work with -pedantic-errors.
 
-    std::vector<size_t> costs(n + 1);
+    std::vector<int> costs(n + 1);
     for (size_t k = 0; k <= n; k++) {
         costs[k] = k;
     }
@@ -91,7 +92,7 @@ size_t LevenshteinDistance(const std::string& s1, const std::string& s2) {
     return costs[n];
 }
 
-size_t MinimalLevenshteinDistance(std::vector<std::string> realmice,
+int MinimalLevenshteinDistance(std::vector<std::string> realmice,
     const std::string& modelmouse) {
 
     size_t dist, min_dist = 500;
@@ -154,7 +155,7 @@ std::pair<std::vector<double>, int> learn(const Maze& mz,
                           const std::string& U_1,
                           size_t eps) {
 
-    int last_step = -1;
+    std::map<int, int> learnt;
     auto U_1_int = char_to_int(mz.GetBjn(), std::vector<char>(all(U_1)) );
     for (size_t k = 0; k != grid.size(); ++k) {
 
@@ -163,20 +164,20 @@ std::pair<std::vector<double>, int> learn(const Maze& mz,
         auto G = gen_paths_file_str(mz, DV, trials, U_1_int);
 
         for (size_t i = 1; i < trials + 1; ++i) {
-            size_t res = MinimalLevenshteinDistance(U, G[i]);
-            if (res < eps) {
-                last_step = k;
-                goto out;
+            int res = MinimalLevenshteinDistance(U, G[i]);
+            if (res <= eps) {
+                learnt[res] = k;
             }
         }
     }
 
-    out:
-    if (last_step != -1) {
-        std::cout << "Полученны оптимальные значения вероятностей на шаге " << last_step << '\n';
-        std::cout << "Их значения: ";
-        alert(grid[last_step]);
-        return std::make_pair(grid[last_step], last_step);
+    std::map<int, int>::iterator it = learnt.begin();
+    if (!learnt.empty()) {
+        std::cout << "Полученны оптимальные значения вероятностей на шаге " << it->second 
+            << " со значением метрики " << it->first << '\n';
+        std::cout << "Вероятности: ";
+        alert(grid[it->second]);
+        return std::make_pair(grid[it->second], it->second);
     } else {
         std::cout << "Не удалось получить оптимальные значения вероятностей\n";
     }
