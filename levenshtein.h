@@ -231,11 +231,7 @@ std::pair<std::vector<double>, int> learn(const Maze& mz,
             if (G[i].size() > 0 && G[i].size() < treshold) {
                 res = MinimalLevenshteinDistance(U, G[i]);
             }
-            // std::cout << "res: " << res << ' ' << G[i].size() << "\n";
-            /*if (res <= eps) {
-                std::cout << "COOL!\n";
-                learnt[res] = k;
-            }*/
+            
             learnt[res] = k;
         }
 
@@ -244,7 +240,7 @@ std::pair<std::vector<double>, int> learn(const Maze& mz,
 
     auto it = learnt.begin();
     if (!learnt.empty()) {
-        std::cout << "Полученны оптимальные значения вероятностей на шаге " << it->second 
+        std::cout << "Получены оптимальные значения вероятностей на шаге " << it->second 
             << " со значением метрики " << it->first << '\n';
         std::cout << "Вероятности: ";
         alert(grid[it->second]);
