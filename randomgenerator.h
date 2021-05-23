@@ -1,5 +1,6 @@
 #pragma once
 #include <random>
+#include <ctime>
 
 // Класс можно дополнить различными распределениями из
 // https://en.cppreference.com/w/cpp/numeric/random
@@ -23,18 +24,11 @@ public:
         return range(gen);
     }
 
-    friend size_t random_choice(const std::vector<int>& v);
+    friend int random_choice(const std::vector<int>& v);
 };
 
 static RandomGenerator gen;
 
-size_t random_choice(const std::vector<int>& v){
-    double prob = gen.d_udist(0, 1);
-    for (size_t i = 0; i != v.size(); ++i) {
-        if (1. / (double(i) + 1) < prob) {
-            return i;
-        }
-    }
-
-    return 0;
+int random_choice(const std::vector<int>& v){
+    return gen.int_udist(0, v.size() - 1);
 }

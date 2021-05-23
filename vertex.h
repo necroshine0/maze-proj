@@ -145,6 +145,13 @@ public:
 
     std::vector<std::string> convert_to_dirs(std::vector<int> v) {
         // try catch if v.size is invalid <= 1
+        try {
+            if (v.size() < 2) {
+                throw std::invalid_argument("");
+            }
+        } catch (...) {
+            exit(1);
+        }
         std::vector<std::string> converted;
         converted.reserve(v.size() - 1);
         for (size_t i = 0; i < v.size() - 1; ++i) {
@@ -156,6 +163,8 @@ public:
 
     template <typename T>
     std::vector<int> convert_to_v(std::vector<std::string> str_v, T start_v) {
+        //std::cout << start_v << ", ";
+        //alert(str_v);
         std::vector<int> converted;
         converted.reserve(str_v.size() + 1);
         converted.push_back(start_v);

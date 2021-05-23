@@ -10,6 +10,9 @@
 #include "maze.h"
 
 extern RandomGenerator gen;
+extern const int INF;
+const int treshold = 500;
+extern double acc;
 
 std::vector<int> subseq(const std::vector<int>& v, size_t a, size_t b) {
     std::vector<int> subseq;
@@ -66,19 +69,18 @@ public:
     void method(const Maze& mz, std::vector<int>& v, size_t subseq_size) const override {
         if (probability == .0) return;
         if (subseq_size > v.size()) { return; }
-
+        
+        auto vs = mz.GetVertexes();
         std::vector<int> subv = subseq(v, v.size() - subseq_size, v.size());
         Directions DIRS = mz.GetDirections();
         auto str_v = DIRS.convert_to_dirs(subv);
         int first_vert = subv.front();
+;
         // Теоретически можно использовать и горизонтальный тип разреза
         std::string type = "vertical";
 
         auto gph = mz.GetGraphList();
-        auto vs = mz.GetVertexes();
         auto borders = mz.GetBorders(type);
-        // std::cout << borders.first << ' ' << borders.second << '\n';
-        // std::cout << vs[first_vert].GetX() << ' ' << vs[first_vert].GetY() << '\n';
         // Симметричная вершина - это вершина с координатами:
         int x = 0, y = 0;
         if (type == "vertical") {
@@ -114,7 +116,10 @@ public:
         }
 
         std::vector<int> tmp_v = mz.GetTensor()(subv.back(), new_vert);
-        for (size_t i = 0; i < tmp_v.size() - 1; ++i) { v.push_back(tmp_v[i]); }
+        if (tmp_v.size() > 0) {
+            for (size_t i = 0; i < tmp_v.size() - 1; ++i) { v.push_back(tmp_v[i]); }
+        }
+
         inverse_dirs(str_v, type);
         subv = DIRS.convert_to_v(str_v, new_vert);
         for (size_t i = 0; i < subv.size(); ++i) { v.push_back(subv[i]); }
@@ -130,7 +135,8 @@ public:
 
     void method(const Maze& mz, std::vector<int>& v, size_t subseq_size) const override {
         if (probability == .0) return;
-        if (subseq_size > v.size()) { return; }
+        if (v.size() < 8) { return; }
+        if (subseq_size >= v.size()) { subseq_size = 2 * v.size() / 3; }
 
         size_t from = v[v.size() - subseq_size];
         size_t to = *(--v.end());
@@ -155,7 +161,6 @@ public:
     void method(const Maze& mz, std::vector<int>& v, size_t subseq_size) const override {
         if (probability == .0) return;
 
-        auto backup = v;
         std::vector<Vertex> VS = mz.GetVertexes();
         int fixed_v = *(--v.end());
         graph_int gph = mz.GetGraphList();
@@ -166,9 +171,7 @@ public:
             current_v = gph[current_v][u];
             v.push_back(current_v);
 
-            if (VS[current_v].bio_value) { 
-                break;
-            }
+            if (VS[current_v].bio_value) { break; }
         }
 
         auto path = mz.GetTensor()(current_v, fixed_v);
@@ -176,16 +179,6 @@ public:
         for (size_t i = 0; i < path.size(); ++i) {
             v.push_back(path[i]);
         }
-
-        if (v.size() > 2 * gph.size() / 3) {
-            v = backup;
-            backup.clear();
-            path.clear();
-            gph.clear();
-            VS.clear();
-            method(mz, v, subseq_size);
-        }
-
     }
 
     void name() const override { std::cout << "I'm a Ring!\n"; }
@@ -222,7 +215,7 @@ public:
     }
     discrete_vector(double p1, double p2, double p3, double p4) {
         try {
-            if ((p1 + p2 + p3 + p4) > 1) {
+            if ((p1 + p2 + p3 + p4) > 1 + acc) {
                 throw std::invalid_argument("ЗАДАННЫЕ ВЕРОЯТНОСТИ НЕ СООТВЕТСТВУЮТ ТРЕБОВАНИЯМ");
             }
         } catch (std::invalid_argument& e) {
@@ -389,7 +382,7 @@ public:
     }
     void SetProbs(double ps, double pi, double pg, double pr) {
         try {
-            if (ps + pi + pg + pr > 1.) {
+            if (ps + pi + pg + pr > 1. + acc) {
                 throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
             }
         } catch (std::invalid_argument& e) {
@@ -433,7 +426,7 @@ public:
         double s = 0;
         for (auto x : probs) { s += x;  }
         try {
-            if (s > 1.) {
+            if (s > 1.+ acc) {
                 throw std::invalid_argument("НЕВАЛИДНЫЙ АРГУМЕНТ");
             }
         }
@@ -478,76 +471,87 @@ public:
     }
 };
 
+// Второй вариант применения ДО к последовательности
+// Применяем N раз какие-нибудь ДО к рандомным элементам последовательности
 std::vector<int> gen_discrete_path(const Maze& mz,
-        const discrete_vector& DV, const std::vector<int>& seq) {
+    const discrete_vector& DV, const std::vector<int>& seq, size_t N) {
 
-    std::vector<int> new_seq;
-    new_seq.reserve(seq.size());
-    for (size_t i = 0; i < seq.size() - 1; ++i) {
-        new_seq.push_back(seq[i]);
-        if (new_seq.size() < 3) { continue; }
-        size_t k = DV.rand_choice();
+    std::vector<int> new_seq = seq;
+    if (seq.size() < 3) { return seq; }
 
-        size_t LENGHT = std::min(int(new_seq.size()), gen.int_udist(2, 6));
-
-        DV[k]->method(mz, new_seq, LENGHT);
-
-        // Посмотрим на последнюю полученную вершину
-        // Если есть ребро с i+1-ой, то ок
-        // Иначе нам надо прийти в i+1, 
-        // желательно по кратчайшему пути
-        // В целом, можно это и сделать и без проверки существования ребра
-        std::vector<int> bridge = mz.GetTensor()(new_seq.back(), seq[i + 1]);
-        
-        if (bridge.size() == 0) { continue; }
-        for (size_t j = 0; j < bridge.size() - 1; ++j) {
-            new_seq.push_back(bridge[j]);
+    for (size_t j = 0; j != N; ++j) {
+        if (new_seq.size() >= treshold) {
+            return new_seq;
         }
+
+        int k = gen.int_udist(2, new_seq.size() - 2);
+        std::vector<int> u(new_seq.begin(), new_seq.begin() + k);
+        std::vector<int> v(new_seq.begin() + k, new_seq.end());
+
+        size_t o_ind = DV.rand_choice();
+        size_t LENGHT = gen.int_udist(2, 6);
+        if (typeid(*DV[o_ind]) == typeid(Grip)) {
+            LENGHT = (size_t)gen.int_udist(6, 30);
+        }
+
+        DV[o_ind]->method(mz, u, LENGHT);
+
+        std::vector<int> bridge = mz.GetTensor()(u.back(), v.front());
+        if (bridge.size() == 0) { continue; }
+        for (size_t i = 0; i < bridge.size() - 1; ++i) {
+            u.push_back(bridge[i]);
+        }
+
+        new_seq = u;
+        new_seq.insert(new_seq.end(), v.begin(), v.end());
     }
 
-    new_seq.push_back(seq.back());
     return new_seq;
 }
+//
+//std::vector<std::vector<int>> gen_paths_file_int(const Maze& mz,
+//            const discrete_vector& DOs, size_t trials, std::vector<int> seq, size_t N) {
+//
+//    std::ofstream file("sequences.txt", std::ios_base::out);
+//    try {
+//        if (!file.is_open())
+//            throw std::runtime_error("НЕ УДАЛОСЬ ОТКРЫТЬ ИЛИ СОЗДАТЬ ФАЙЛ");
+//    }
+//    catch (std::runtime_error& e) {
+//        std::cerr << e.what() << '\n';
+//        exit(1);
+//    }
+//
+//    auto tmp = int_to_char(mz.GetBjn(), seq);
+//    for (auto it = tmp.begin(); it != tmp.end(); ++it) { file << *it; }
+//    file << '\n';
+//
+//    std::vector<std::vector<int>> paths;
+//    paths.reserve(trials + 1);
+//    paths.push_back(seq);
+//    for (size_t i = 0; i < trials; ++i) {
+//        seq = gen_discrete_path(mz, DOs, seq, N);
+//
+//        paths.push_back(seq);
+//        auto seq_chars = int_to_char(mz.GetBjn(), seq);
+//        for (auto it = seq_chars.begin(); it != seq_chars.end(); ++it) { file << *it; }
+//        file << '\n';
+//    }
+//
+//     Последовательности будут разделены переносом строки
+//    file << '\n';
+//    file.close();
+//
+//    return paths;
+//}
 
 // Функция возвращает вектор последовательностей в числовом виде,
 // Вместе с этим записывает из в файл в буквенном виде
 // Файл всегда называется sequences.txt, при отсутствии он будет создан
 std::vector<std::string> gen_paths_file_str(const Maze& mz,
-    const discrete_vector& DOs, size_t trials, std::vector<int> seq) {
+    const discrete_vector& DOs, size_t trials, std::vector<int> seq, size_t N) {
 
-    std::ofstream file("sequences.txt", std::ios_base::out);
-    try {
-        if (!file.is_open())
-            throw std::runtime_error("НЕ УДАЛОСЬ ОТКРЫТЬ ИЛИ СОЗДАТЬ ФАЙЛ");
-    } catch (std::runtime_error& e) {
-        std::cerr << e.what() << '\n';
-        exit(1);
-    }
-
-    auto tmp = int_to_char(mz.GetBjn(), seq);
-    for (auto it = tmp.begin(); it != tmp.end(); ++it) { file << *it; }
-    file << '\n';
-
-    std::vector<std::vector<int>> paths;
-    paths.reserve(trials + 1);
-    paths.push_back(seq);
-    for (size_t i = 0; i < trials; ++i) {
-        seq = gen_discrete_path(mz, DOs, seq);
-        paths.push_back(seq);
-        std::string seq_chars = int_to_char_str(mz.GetBjn(), seq);
-        for (auto it = seq_chars.begin(); it != seq_chars.end(); ++it) { file << *it; }
-        file << '\n';
-    }
-
-    // Последовательности будут разделены переносом строки
-    file << '\n';
-    file.close();
-}
-
-std::vector<std::vector<int>> gen_paths_file_int(const Maze& mz,
-    const discrete_vector& DOs, size_t trials, std::vector<int> seq) {
-
-    std::ofstream file("sequences.txt", std::ios_base::out);
+    std::ofstream file("sequences.txt", std::ios_base::out | std::ios_base::app);
     try {
         if (!file.is_open())
             throw std::runtime_error("НЕ УДАЛОСЬ ОТКРЫТЬ ИЛИ СОЗДАТЬ ФАЙЛ");
@@ -557,17 +561,17 @@ std::vector<std::vector<int>> gen_paths_file_int(const Maze& mz,
         exit(1);
     }
 
-    auto tmp = int_to_char(mz.GetBjn(), seq);
+    auto tmp = int_to_char_str(mz.GetBjn(), seq);
     for (auto it = tmp.begin(); it != tmp.end(); ++it) { file << *it; }
     file << '\n';
 
-    std::vector<std::vector<int>> paths;
+    std::vector<std::string> paths;
     paths.reserve(trials + 1);
-    paths.push_back(seq);
+    paths.push_back(tmp);
     for (size_t i = 0; i < trials; ++i) {
-        seq = gen_discrete_path(mz, DOs, seq);
-        paths.push_back(seq);
-        auto seq_chars = int_to_char(mz.GetBjn(), seq);
+        seq = gen_discrete_path(mz, DOs, seq, N);
+        std::string seq_chars = int_to_char_str(mz.GetBjn(), seq);
+        paths.push_back(seq_chars);
         for (auto it = seq_chars.begin(); it != seq_chars.end(); ++it) { file << *it; }
         file << '\n';
     }
@@ -575,4 +579,6 @@ std::vector<std::vector<int>> gen_paths_file_int(const Maze& mz,
     // Последовательности будут разделены переносом строки
     file << '\n';
     file.close();
+
+    return paths;
 }

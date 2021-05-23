@@ -17,7 +17,7 @@ extern const int INF;
 class Maze {
 private:
     Bjn bjn;
-    Symmetric_Tensor3D ST;
+    Tensor3D ST;
     Directions DIRS;
     graph_int gph;
     std::vector<Vertex> vertexes;
@@ -40,7 +40,7 @@ public:
     const std::vector<Vertex> GetVertexes() const { return vertexes; }
     const Directions GetDirections() const { return DIRS; }
     const graph_int GetGraphList() const { return gph; }
-    const Symmetric_Tensor3D GetTensor() const { return ST; }
+    const Tensor3D GetTensor() const { return ST; }
 
     const std::pair<int, int> GetBorders(std::string type) const {
         int mn = 0, mx = 0;
@@ -81,12 +81,12 @@ public:
         size_t current_v = bjn[start_c];
         try {
             if (!vertexes[current_v].is_entry) {
-                throw std::invalid_argument("Õ≈¬¿À»ƒÕ€… ¿–√”Ã≈Õ“");
+                throw std::invalid_argument("–ù–ï–í–ê–õ–ò–î–ù–´–ô –ê–†–ì–£–ú–ï–ù–¢");
             }
         }
         catch (std::invalid_argument& e) {
             std::cerr << e.what() << ": ";
-            std::cerr << "—“¿–“Œ¬¿ﬂ ¬≈–ÿ»Õ¿ ƒŒÀ∆Õ€ ﬂ¬Àﬂ“‹—ﬂ “Œ◊ Œ… ¬’Œƒ¿ ¬ À¿¡»–»Õ“\n";
+            std::cerr << "–°–¢–ê–†–¢–û–í–ê–Ø –í–ï–†–®–ò–ù–ê –î–û–õ–ñ–ù–´ –Ø–í–õ–Ø–¢–¨–°–Ø –¢–û–ß–ö–û–ô –í–•–û–î–ê –í –õ–ê–ë–ò–†–ò–ù–¢\n";
             exit(1);
         }
 
@@ -110,7 +110,7 @@ public:
     }
 };
 
-// ‘‡ÈÎ ÒÓı‡ÌˇÚ¸ ‚ ANSI
+// –§–∞–π–ª —Å–æ—Ö—Ä–∞–Ω—è—Ç—å –≤ ANSI
 Maze Construct_Maze(std::string filename) {
     setlocale(LC_ALL, "rus");
     std::ifstream file;
@@ -118,7 +118,7 @@ Maze Construct_Maze(std::string filename) {
 
     try {
         if (!file.is_open())
-            throw std::runtime_error("Õ≈ ”ƒ¿ÀŒ—‹ Œ“ –€“‹ ‘¿…À");
+            throw std::runtime_error("–ù–ï –£–î–ê–õ–û–°–¨ –û–¢–ö–†–´–¢–¨ –§–ê–ô–õ");
     } catch (std::runtime_error & e) {
         std::cerr << e.what() << '\n';
         exit(1);
